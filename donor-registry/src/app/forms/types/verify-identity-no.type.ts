@@ -14,7 +14,7 @@ import {
     <div>
       <span class="fw-bold p12">{{ to.label }} *</span> <br />
       <div class="d-flex">
-        <input
+        <input 
           id="{{ field.key }}"  maxLength="14" 
           [formControl]="formControl"
           [formlyAttributes]="field"
@@ -43,7 +43,6 @@ import {
       <div class="p12" id="abhamessage"></div>
       
       <br />
-
       <div
         *ngIf="!canRegister || isIdentityNo || isGotErr"
         class="modal fade"
@@ -77,44 +76,41 @@ import {
             </div>
           </div>
         </div>
-
-
-        <div *ngIf="isGotErr" class="modal-dialog" role="document">
+        <div *ngIf="isGotErr && !err401 " class="modal-dialog" role="document">
         <div class="p-4 modal-content">
-            <div class="modal-body text-center">
-                <div class="d-flex flex-column justify-content-center align-items-center">
+            <div  class="modal-body text-center">
+                <div   class="d-flex flex-column justify-content-center align-items-center">
                    <div *ngIf="isAbhaNoErr">
-                   <span *ngIf="!errorMessage" class="p24 mb-2 mt-2 mb-2 fw-bold">Invalid ABHA number</span>
+                   <span *ngIf="!errorMessage" class="p24 mb-2 mt-2 mb-2 fw-bold"></span>
+                   <br>
                    <span *ngIf="customErrCode == '420'" class="p24 mb-2 mt-2 mb-2 fw-bold">ABHA number entered multiple times</span>
-
-
+                   <span *ngIf="customErrCode == '427'" class="p24 mb-2 mt-2 mb-2 fw-bold">Invalid ABHA number</span>
+                   <br /> <br />
+                   <span *ngIf="errorMessage" class="p14 mb-2 mt-2 mb-2">{{errorMessage}}</span>
                    
-                   <span *ngIf="errorMessage" class="p24 mb-2 mt-2 mb-2 fw-bold">{{errorMessage}}</span>
-
-                    <br /> <br />
+                   <br /> <br />
                  
-                   <span>Please enter valid ABHA number</span> <br />
                 
                     </div>
-
                     <div *ngIf="!isAbhaNoErr">
-                    <span *ngIf="!errorMessage" class="p24 mb-2 mt-2 mb-2 fw-bold">Invalid ABHA number</span>
-                    <span *ngIf="customErrCode == '401'" class="p24 mb-2 mt-2 mb-2 fw-bold">Please enter valid ABHA number</span>
-
-                    <span *ngIf="errorMessage" class="p24 mb-2 mt-2 mb-2 fw-bold">{{errorMessage}}</span>
+                    <span *ngIf="!errorMessage" class="p24 mb-2 mt-2 mb-2 fw-bold">Invalid OTP number</span>
+                    <span *ngIf="customErrCode == '429'" class="p24 mb-2 mt-2 mb-2 fw-bold">OTP entered multiple times</span>
+                    <br>
+                  
+                    <br>
+                    <span *ngIf="errorMessage" class="p16 mb-2 mt-2 mb-2 fw-bold">{{errorMessage}}</span>
                     <br />
                     <br />
                      </div>
                     <div class="container-fluid mt-3">
                         <button type="button" class=" btn btn-primary-notto btn-style w-100 submit-button mb-2"
-                            data-dismiss="modal" aria-label="Close">OK</button>
+                        data-toggle="modal"  data-dismiss="modal" aria-label="Close">OK</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-        <div *ngIf="true" class="modal-dialog" role="document">
+        <div *ngIf="!isGotErr || err401" class="modal-dialog" role="document">
           <div class="p-4 modal-content">
             <div
               class="close float-end"
@@ -129,13 +125,13 @@ import {
                 Enter the code sent to mobile number associated with your ID
               </p>
               <span class="fw-bold p12"> Enter OTP</span> <br />
-              <input
+              <input maxLength="6"
                 type="input"
                 [(ngModel)]="optVal"
                 name="optVal"
                 class="form-control"
               />
-              <span *ngIf="!errorMessage" class="p12 red lh-32">{{errorMessage}}</span>
+              <span *ngIf="err401" class="p12 red lh-32">{{errorMessage}}</span>
               <br />
               <button
                 m
@@ -168,9 +164,7 @@ import {
           Close
         </button>
       </div>
-
      
-
     </div>
   `,
 })
@@ -183,7 +177,7 @@ export class VerifyIndentityCode extends FieldType {
   isIdentityNo: boolean = true;
   canRegister: boolean = true;
   isGotErr: boolean = false;
-
+  isConfirmPopup : boolean = false;
   transactionId: string;
   model1: any;
   errorMessage: any;
@@ -193,6 +187,9 @@ export class VerifyIndentityCode extends FieldType {
  signupForm: boolean;
   isAbhaNoErr: boolean = false;
   customErrCode: string;
+  err401: boolean = false;
+  err429: boolean = false;
+
   constructor(private http: HttpClient, public generalService: GeneralService,public router: Router,) {
     super();
   }
@@ -213,6 +210,7 @@ export class VerifyIndentityCode extends FieldType {
     this.isGotErr = false;
 
     this.number = (<HTMLInputElement>document.getElementById(value)).value;
+
     if (this.number) {
       this.model1 = {
         healthId: this.number,
@@ -224,6 +222,7 @@ export class VerifyIndentityCode extends FieldType {
           next: (data) => {
             this.isGotErr = false;
             this.isIdentityNo = true;
+            this.isConfirmPopup = true;
             console.log(data);
             this.transactionId = data.txnId;
           },
@@ -256,10 +255,17 @@ export class VerifyIndentityCode extends FieldType {
 
   checkErrType(err)
   {
-    let errorMessage = err?.error['message'];
-    if(errorMessage.includes('30'))
+
+     this.errorMessage = err?.error['message'];
+    if(this.errorMessage.includes('30'))
     {
       this.customErrCode = '420';
+     
+    }
+    if(this.errorMessage.includes('enter valid ABHA'))
+    {
+      this.customErrCode = '427';
+     
     }
 
 
@@ -318,11 +324,23 @@ export class VerifyIndentityCode extends FieldType {
           error: (error) => {
             this.errorMessage = error?.error['message'];
             this.customErrCode = (error?.error['status'])? error?.error['status'] : "";
-            if( error?.error['status'] != '401')
+            if( error?.error['status'] == '401')
             {
               this.isGotErr = true;
               this.isAbhaNoErr = false;
               this.isIdentityNo = true;
+              this.err401 = true;
+              this.err429 = false;
+
+            }
+            if( error?.error['status'] == '429')
+            {
+              this.isGotErr = true;
+              this.isAbhaNoErr = false;
+              this.isIdentityNo = true;
+              this.err401 = false;
+              this.err429 = true;
+
             }
          
             console.error('There was an error!', error);
