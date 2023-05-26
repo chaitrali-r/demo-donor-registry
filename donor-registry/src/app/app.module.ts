@@ -66,7 +66,7 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { HttpClient } from '@angular/common/http';
 import { config } from 'process';
 import { ColorPickerModule } from 'ngx-color-picker';
-import { VerifyCertificateComponent } from './verify-certificate/verify-certificate.component';
+//import { VerifyCertificateComponent } from './verify-certificate/verify-certificate.component';
 
 
 
@@ -136,9 +136,10 @@ import { FormlyTemplateType } from './forms/types/template.type';
 import { FormlyFieldNgSelectAllCheckbox } from './forms/types/select-all-checkbox.type';
 import { CertificateComponent } from './certificate/certificate.component';
 import { TooltipWrapper } from './forms/types/tooltip.type';
-import { VerifyModule } from 'vc-verification';
+import { VerifyAadhar } from './forms/types/verify-aadhar.type';
+//import { VerifyModule } from 'vc-verification';
 
-import { ZXingScannerModule } from '@zxing/ngx-scanner';
+//import { ZXingScannerModule } from '@zxing/ngx-scanner';
 
 // import { FormlyFieldSelect } from './forms/types/select.type';
 // import { CreateCertificateComponent } from './create-certificate/create-certificate.component';
@@ -166,6 +167,7 @@ let configData = {
     AutocompleteTypeComponent,
     VerifyIndentityCode,
     VerifyMobileNo,
+    VerifyAadhar, 
     FormlyColorInput,
     FormlyFieldStepper,
     HeaderComponent,
@@ -186,7 +188,7 @@ let configData = {
     FormlyTemplateType,
     FormlyFieldNgSelectAllCheckbox,
     CertificateComponent,
-    VerifyCertificateComponent,
+  
     TooltipWrapper,
   ],
   imports: [
@@ -203,8 +205,8 @@ let configData = {
     Bootstrap4FrameworkModule,
     AngularMultiSelectModule,
     NgSelectModule,
-    VerifyModule.forChild(configData),
-    ZXingScannerModule,
+    
+   
     HttpClientModule,
     TranslateModule.forRoot(),
 
@@ -257,6 +259,8 @@ let configData = {
         { name: 'color', component: FormlyColorInput },
         { name: 'verify-code', component: VerifyIndentityCode },
         { name: 'verify-mobileno', component: VerifyMobileNo },
+        { name: 'verify-aadhar', component: VerifyAadhar },
+
         { name: 'stepper', component: FormlyFieldStepper, wrappers: [] },
         { name: 'template', component: FormlyTemplateType }
       ],

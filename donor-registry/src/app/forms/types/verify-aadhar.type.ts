@@ -7,13 +7,13 @@ import { GeneralService, getDonorServiceHost } from '../../services/general/gene
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
-  selector: 'verify-mobileno',
+  selector: 'verify-aadhar',
   styleUrls: ['../forms.component.scss'],
-  templateUrl: './verify-mobileno.type.html',
+  templateUrl: './verify-aadhar.type.html',
 })
-export class VerifyMobileNo extends FieldType {
+export class VerifyAadhar extends FieldType {
   isVerify: boolean = false;
-  number: string;
+  aadharnumbernumber: string;
   transactionId: any;
   optVal: any;
   linkedAbhaList: any;
@@ -32,6 +32,9 @@ export class VerifyMobileNo extends FieldType {
   isOpen: boolean = true;
   err422: boolean;
   signupForm: boolean = false;
+  consentGiven: boolean = false;
+  aadharnumber: string;
+  btnenable: boolean;
 
   constructor(private http: HttpClient, public generalService: GeneralService, public router: Router,
     public translate: TranslateService) {
@@ -48,43 +51,47 @@ export class VerifyMobileNo extends FieldType {
     }
   }
 
+  //Check whether consent is provided or not
+  checkValue(event:any){
+    if(event.target.checked==true){
+      this.consentGiven == true;
+      this.btnenable ==true;
+    }
+    else{
+      this.consentGiven == false;
+    }
+  }
+
   async verifyOtp(fieldKey) {
     this.fieldKey = fieldKey;
 
-    this.number = (<HTMLInputElement>document.getElementById(fieldKey)).value;
+    this.aadharnumber = (<HTMLInputElement>document.getElementById(fieldKey)).value;
 
-    if (this.number && this.number.length == 10) {
-
-      let dateSpan = document.getElementById('mobmessage');
-      dateSpan.classList.remove('text-danger');
-      dateSpan.innerText = "";
-      document.getElementById('mobileno').classList.remove('is-invalid');
-
+    if (this.aadharnumber && this.aadharnumber.length == 12) {
+        
       let param = {
-        mobile: this.number,
+        aadhaar: this.aadharnumber,
       };
       this.http
-        .post<any>(`${getDonorServiceHost()}/auth/mobile/sendOTP`, param)
+        .post<any>(`${getDonorServiceHost()}/abha/registration/aadhaar/generateOtp`, param)
         .subscribe({
           next: (data) => {
             this.transactionId = data.txnId;
            // this.OtpPopup();
+           
           },
           error: (error) => {
             //  (<HTMLInputElement>document.getElementById(fieldKey)).value = "";
-            this.selectProfile();
-            this.noLinkedAbha = true;
-            this.checkErrType(error);
-
+           
             console.log(error);
           }
         });
     } else {
-      this.isNumberValid = false;
-      let dateSpan = document.getElementById('mobmessage');
-      dateSpan.classList.add('text-danger');
-      dateSpan.innerText = "Please enter valid mobile number";
-      document.getElementById('mobileno').classList.add('is-invalid');
+      // this.isNumberValid = false;
+      // let dateSpan = document.getElementById('mobmessage');
+      // dateSpan.classList.add('text-danger');
+      // dateSpan.innerText = "Please enter valid mobile number";
+      // document.getElementById('mobileno').classList.add('is-invalid');
     }
   }
 
@@ -170,37 +177,34 @@ export class VerifyMobileNo extends FieldType {
   submitOtp() {
     if (this.optVal) {
       let param = {
-        transactionId: this.transactionId,
+        txnId: this.transactionId,
         otp: this.optVal,
       };
 
       localStorage.setItem('isAutoFill', 'true');
 
       this.http
-        .post<any>(`${getDonorServiceHost()}/auth/mobile/verifyOTP`, param)
+        .post<any>(`${getDonorServiceHost()}/abha/registration/aadhaar/verifyOtp`, param)
         .subscribe({
           next: (data) => {
-            this.isVerify = true;
-            this.closePops('verifyOtpPopup');
-            this.linkedAbhaList = data;
+            console.log(data);
+            if(data?.txnId){
+              console.log('call mobile pop up')
+              this.mobilPopup();
 
-            for (let i = 0; i < data['mobileLinkedHid'].length; i++) {
-              if (!data['mobileLinkedHid'][i].pledged) {
-                this.isAllAbhaRegister = true;
-              }
+            }else{
+              console.log('auto populate')
             }
-
-            document.getElementById('closeModalButton').click();
-            this.selectProfile();
+           
 
           },
           error: (error) => {
 
-            this.errorMessage = error?.error['message'];
-            this.customErrCode = (error?.error['status']) ? error?.error['status'] : "";
-            if (error?.error['status'] == '401') {
-              this.err401 = true;
-            }
+            // this.errorMessage = error?.error['message'];
+            // this.customErrCode = (error?.error['status']) ? error?.error['status'] : "";
+            // if (error?.error['status'] == '401') {
+            //   this.err401 = true;
+            // }
 
             console.error('There was an error!', error);
           },
@@ -236,6 +240,14 @@ export class VerifyMobileNo extends FieldType {
     button.remove();
   }
 
+  mobilPopup(id = "mobilePopup") {
+    var button = document.createElement("button");
+    button.setAttribute('data-toggle', 'modal');
+    button.setAttribute('data-target', `#${id}`);
+    document.body.appendChild(button)
+    button.click();
+    button.remove();
+  }
   selectProfile(id = 'selectProfileModel') {
     var button = document.createElement("button");
     button.setAttribute('data-toggle', 'modal');
@@ -256,4 +268,5 @@ export class VerifyMobileNo extends FieldType {
     window.location.reload();
     // (<HTMLInputElement>document.getElementById(this.fieldKey)).value = '';
   }
+ 
 }

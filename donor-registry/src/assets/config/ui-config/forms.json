@@ -75,10 +75,14 @@
                           {
                             "value": "ABHA Number",
                             "key": "abha"
+                          },
+                          {
+                            "value": "Aadhar Number",
+                            "key": "aadhar"
                           }
                         ]
                       },
-                      "defaultValue": "mobile"
+                      "defaultValue": "aadhar"
                      
                     }
                   }
@@ -103,6 +107,26 @@
                   }
                 }
               },
+              {
+                "name": "aadhar",
+                "custom": true,
+                "key": "aadhar",
+                "type": "verify-aadhar",
+                "element": {
+                  "title": "Aadhar Number",
+                  "fieldGroupClassName": "row",
+                  "widget": {
+                    "formlyConfig": {
+                      "title": "Aadhar Number",
+                      "placeholder": "Enter your aadhar",
+                      "type": "verify-aadhar",
+                      "className": "col-lg-12 col-sm-12 mlf-14 mb-3",
+                      "hideExpression": "model.registrationBy != 'aadhar'"
+                    }
+                  }
+                }
+              },
+             
               {
                 "name": "identificationDetails",
                 "children": {

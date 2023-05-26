@@ -160,6 +160,8 @@ export class FormsComponent implements OnInit {
     if (this.form == 'signup') {
       const mobilePlaceholder = document.getElementById('mobileno');
       mobilePlaceholder['placeholder'] = "XXXXXXXXXX";
+      const adharPlaceHolder = document.getElementById('aadhar');
+      adharPlaceHolder['placeholder'] = "XXXXXXXXXXXX";
       if (localStorage.getItem('isVerified')) {
         this.tempData = JSON.parse(localStorage.getItem("form_value"));
 
@@ -173,7 +175,7 @@ export class FormsComponent implements OnInit {
 
           if (this.tempData) {
             if (isAutoFill != "false") {
-              (<HTMLInputElement>document.getElementById("formly_19_radio_registrationBy_1_0")).disabled = true;  
+              (<HTMLInputElement>document.getElementById("formly_19_radio__1_0")).disabled = true;  
               (<HTMLInputElement>document.getElementById("formly_19_radio_registrationBy_1_1")).disabled = true;  
 
               this.model = {
